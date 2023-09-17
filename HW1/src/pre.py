@@ -33,13 +33,16 @@ data = data.rename(columns={data.columns[5]: 'event-time-value'})
 
 portfolio = pd.read_csv('../doc/portfolio.csv', encoding='utf-8')
 #删除掉没有命名的列也就是列0 同时也就是可以直接用
-portfolio = portfolio.drop(['Unnamed: 0'],axis=1)
-portfolio = portfolio.rename(columns={portfolio.columns[5] : 'offer_id'})
+
+portfolio = portfolio.rename(columns={portfolio.columns[0] :'recommend_way'})
+portfolio = portfolio.rename(columns={portfolio.columns[6] : 'offer id'})
 test= list(portfolio.keys())
 print(test)
 
 # 把相同的id行合并
-
+index = "0b1e1539f2cc45b7b9fa7c272da2e1d7"
+columns = portfolio.index[portfolio['offer id']==index]
+print(columns)
 # test
 i = 0
 flag = 1
@@ -55,12 +58,35 @@ for strings in data['event-time-value']:
         new_dicts[new_key] =  value
         string.append(new_dicts)
         string.pop(2)
-        print(string)
+
+# amount_sums
+def calculate_sum(lst):
+    total_sum = 0
+    for items in lst:
+        for key,value in items[2].items():
+            if key == 'amount':
+                total_sum += value
+    return total_sum
+
+data['amount_sums'] = data['event-time-value'].apply(calculate_sum)
+
+# for j,strings in enumerate(data['event-time-value']):
+#     for string in strings:
+#         for key,value_amount in string[2].items():
+#             if key == 'amount':
+#                 data['value_sum'] += value_amount
+                
+# 时间处理
+data['became_member_on']=data['became_member_on'].astype(str)
+data['became_member_on']=pd.to_datetime(data['became_member_on'])
+                
+
 
 # for see
+
 data.to_csv('../doc/read.csv',index=False)
-# for i,_ in enumerate(data['event-time-value']):
-#     data['event-time-value'][i].to_list()
+
+# for debug
 print((data['event-time-value'][0]))
 print(type(data['age'][0]))
 i = 0
